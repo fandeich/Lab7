@@ -1,0 +1,77 @@
+#include <iostream>
+#include <stdio.h>
+#include <string>
+#define _CRT_SECURE_NO_WARNINGS
+using namespace std;
+
+struct _time           //Время работы
+{
+	int hopening;     //Время открытия : часы
+	int mopening;     //Время открытия : минуты
+	int hclosing;     //Время закрытия : часы
+	int mclosing;     //Время закрытия : минуты
+};
+
+struct Library        //Библиотека
+{
+	int number;       //Номер библиотеки
+	bool type;	      //Тип библиотеки(взрослая,детская)
+	int area;      //Район библиотеки
+	char address[15];   //Адрес библиотеки
+	_time time;
+};
+
+void Creat_BinFile_from_Text(FILE* bin)
+{
+	FILE* txt = new FILE();           //Файловая переменная
+	fopen_s(&txt, "input.txt", "rt"); //Привязываю к текстовику
+
+	Library curr;                     //Переменная в которую буду записывать данные о библиотеках
+
+	while (!feof(txt))
+	{
+		
+		fscanf_s(txt, "%d", &curr.number); //Ввожу номер библиотеки
+		int boool;
+		fscanf_s(txt, "%d", &boool);
+		curr.type = boool;                 //Тип библиотеки
+		fscanf_s(txt, "%d", &curr.area);   //Район
+		fscanf_s(txt, "%s", curr.address);//Адрес
+		fscanf_s(txt, "%d", &curr.time.hopening);//Время открытия : часы
+		fscanf_s(txt, "%d", &curr.time.mopening);//Время открытия : минуты
+		fscanf_s(txt, "%d", &curr.time.hclosing);//Время закрытия : часы
+		fscanf_s(txt, "%d", &curr.time.mclosing);//Время закрытия : минуты
+		
+		cout << curr.address;
+		fwrite(&curr, sizeof(Library), 1, bin);
+	}
+	fclose(txt);
+	fclose(bin);
+}
+
+void View_BinFile(FILE* bin)
+{
+	fopen_s(&bin,"Bin.dat", "w+b");
+	Library curr;
+	while (feof(bin))
+	{
+		fread(&curr, sizeof(Library), 1, bin);
+		cout << "Номер библиотеки : " << curr.number << '\n';
+		if (curr.type == 1)
+			cout << "Взрослая";
+		else
+			cout << "Детская";
+		cout << "\nРайон : " << curr.area << "\nАдрес : " << curr.address << "\nВремя работы : " << curr.time.hopening << ':' << curr.time.mopening << " - " << curr.time.hclosing << ':' << curr.time.mclosing;
+		cout << "\n\n";
+	}
+	fclose(bin);
+}
+
+int main()
+{
+	setlocale(LC_ALL, "Russian");
+	FILE* bin=new FILE();
+	Creat_BinFile_from_Text(bin);
+	View_BinFile(bin);
+	
+}
